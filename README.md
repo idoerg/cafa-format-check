@@ -21,4 +21,5 @@ Where "filename" is the path to the prediction file
 Authored by Iddo Friedberg. Distributed under GPLv3 license (attached)
 
 Contact: idoerg@gmail.com
+
 cafa.2014@gmail.com
