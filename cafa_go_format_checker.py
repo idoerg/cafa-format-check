@@ -1,5 +1,18 @@
 #!/usr/bin/env python
 
+
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import re
 import sys
 
@@ -8,6 +21,9 @@ rc_field = re.compile("^RC=[0,1]\.[0-9][0-9]$")
 go_field = re.compile("^GO:[0-9]{5,7}$")
 target_field = re.compile("^T[0-9]{5,20}$")
 confidence_field = re.compile("^[0,1]\.[0-9][0-9]$")
+
+# Legal states: the CAFA prediction records fields, and their order. KEYWORDS and ACCURACY are
+# optional
 legal_states1 = ["author","model","keywords","accuracy","go_prediction","end"]
 legal_states2 = ["author","model","keywords","go_prediction","end"]
 legal_states3 = ["author","model","go_prediction","end"]
@@ -25,6 +41,14 @@ legal_keywords = [
 "natural language processing", "other functional information"
 ]
     
+"""
+A collection of modules to check the format of the different records in the CAFA prediction file
+Accept the current record (inrec). Then returns a boolean value if it is correct or not, and an
+applicable error message.
+
+The "correct" and "errmsg" variables then should be passed to the "handle_error" function
+"""
+
 def author_check(inrec):
     correct = True
     errmsg = None
@@ -131,6 +155,10 @@ def handle_error(correct, errmsg, inrec):
         raise ValueError, errmsg
 
 def cafa_checker(infile):
+    """
+    Main program that: 1. identifies fields; 2. Calls the proper checker function; 3. calls the
+    error handler "handle_error" which raises a ValueError
+    """
     visited_states = []
     s_token = 0
     n_accuracy = 0
