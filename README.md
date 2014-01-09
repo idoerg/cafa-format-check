@@ -8,6 +8,11 @@ Specifically, for the CAFA rules see: http://biofunctionprediction.org/node/8
 
 ##### Running
 
+_New_ for any prediction file:
+```bash
+./cafa_format_checker.py filename
+```
+This checks any type of prediction file.
 
 For GO based predictions:
 ```bash

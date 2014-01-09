@@ -18,10 +18,10 @@ import sys
 
 pr_field = re.compile("^PR=[0,1]\.[0-9][0-9];$")
 rc_field = re.compile("^RC=[0,1]\.[0-9][0-9]$")
-go_field = re.compile("^GO:[0-9]{5,7}$")
-# Fix to add EFI and HP
-target_field = re.compile("^(T|EFI|HP)[0-9]{5,20}$")
-#target_field = re.compile("^T[0-9]{5,20}$")
+# Fix to add HP ontology 2014-1-9
+go_field = re.compile("^(GO|HP):[0-9]{5,7}$")
+# Fix to add EFI targets 2014-1-9
+target_field = re.compile("^(T|EFI)[0-9]{5,20}$")
 confidence_field = re.compile("^[0,1]\.[0-9][0-9]$")
 
 # Legal states: the CAFA prediction records fields, and their order. KEYWORDS and ACCURACY are
