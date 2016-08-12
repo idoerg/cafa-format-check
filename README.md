@@ -1,8 +1,8 @@
 
 This repository contains two Python scripts for checking the format of 
-prediction files for CAFA 2.
+prediction files for CAFA2 and CAFA3
 
-For more information on CAFA 2 see: http://biofunctionprediction.org
+For more information on CAFA  see: http://biofunctionprediction.org
 Specifically, for the CAFA rules see: http://biofunctionprediction.org/node/8
 
 Running
@@ -28,4 +28,5 @@ Authored by Iddo Friedberg. Distributed under GPLv3 license (attached)
 
 Contact: idoerg@gmail.com
 
-cafa.2014@gmail.com
+*Important*: If you are participating in CAFA, you should subscribe to the afp-cafa
+mailing list: https://mailman.iastate.edu/mailman/listinfo/afpcafa
