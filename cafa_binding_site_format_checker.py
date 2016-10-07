@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
 #    the Free Software Foundation, either version 3 of the License, or
@@ -17,12 +18,18 @@ import sys
 
 pr_field = re.compile("^PR=[0,1]\.[0-9][0-9];$")
 rc_field = re.compile("^RC=[0,1]\.[0-9][0-9]$")
-hpo_field = re.compile("^HP:[0-9]{5,7}$")
-target_field = re.compile("^T[0-9]{5,20}$")
+# Fix to add EFI and HP
+target_field = re.compile("^>(T|EFI)[0-9]{5,20}$")
+type_field = re.compile("^[DNA,RNA,METAL]")
+prediction_field = re.compile("^[0,1]\.[0-9][0-9]")
+#target_field = re.compile("^T[0-9]{5,20}$")
 confidence_field = re.compile("^[0,1]\.[0-9][0-9]$")
-legal_states1 = ["author","model","keywords","accuracy","hpo_prediction","end"]
-legal_states2 = ["author","model","keywords","hpo_prediction","end"]
-legal_states3 = ["author","model","hpo_prediction","end"]
+
+# Legal states: the CAFA prediction records fields, and their order. KEYWORDS and ACCURACY are
+# optional
+legal_states1 = ["author","model","keywords","accuracy","binding_site","end"]
+legal_states2 = ["author","model","keywords","binding_site","end"]
+legal_states3 = ["author","model","binding_site","end"]
 
 legal_keywords = [
 "sequence alignment", "sequence-profile alignment", "profile-profile alignment", "phylogeny",
@@ -37,6 +44,13 @@ legal_keywords = [
 "natural language processing", "other functional information"
 ]
     
+"""
+A collection of modules to check the format of the different records in the CAFA prediction file
+Accept the current record (inrec). Then returns a boolean value if it is correct or not, and an
+applicable error message.
+
+The "correct" and "errmsg" variables then should be passed to the "handle_error" function
+"""
 
 def author_check(inrec):
     correct = True
@@ -105,26 +119,39 @@ def accuracy_check(inrec):
     return correct, errmsg
 
 
-def hpo_prediction_check(inrec):
+def binding_site_prediction_check(inrec, current_prediction):
     correct = True
     errmsg = None
-    fields = [i.strip() for i in inrec.split()]
-    if len(fields) != 3:
+    fields = [i.strip() for i in inrec.split(",")]
+    if target_field.match(fields[0]) and (len(current_prediction) == 0 or prediction_field.match(current_prediction[-1])):
+        current_prediction = []
+        current_prediction.append(fields[0])
+        correct = True
+    elif len(current_prediction) == 0 and not target_field.match(fields[0]):
         correct = False
-        errmsg = "HPO prediction: wrong number of fields. Should be 3"
-    elif not target_field.match(fields[0]):
+        errmsg = "The first line of predictions must be a target ID"
+    elif type_field.match(fields[0]) and (target_field.match(current_prediction[-1]) or prediction_field.match(current_prediction[-1])) and (fields[0] not in current_prediction):
+        current_prediction.append(fields[0])
+        correct = True
+    elif prediction_field.match(fields[0]) and type_field.match(current_prediction[-1]):
+        current_prediction.append(fields[0])
+        correct = True
+    elif target_field.match(fields[0]) and (len(current_prediction) != 0 and not prediction_field.match(current_prediction[-1])):
         correct = False
-        errmsg = "HPO prediction: error in first (Target ID) field"
-    elif not hpo_field.match(fields[1]):
+        errmsg = "Binding site prediction must follow this format\nexample:\n>T123456\n{RNA, DNA, METAL}\n0.00, 0.01, 0.51, 0.81, 0.50"
+    elif type_field.match(fields[0]) and (type_field.match(current_prediction[-1])):
         correct = False
-        errmsg = "HPO prediction: error in second (HP ID) field"
-    elif not confidence_field.match(fields[2]):
+        errmsg = "Binding site type specification must be followed by a protein sequence prediction set\nexample:\n{RNA, DNA, METAL}\n0.00, 0.01, 0.51, 0.81, 0.50"
+    elif type_field.match(fields[0]) and (fields[0] in current_prediction):
         correct = False
-        errmsg = "GO prediction: error in third (confidence) field"
-    elif float(fields[2]) > 1.0:
+        errmsg = "Only one prediction for each binding site type allowed per target"
+    elif prediction_field.match(fields[0]) and not type_field.match(current_prediction[-1]):
         correct = False
-        errmsg = "GO prediction: error in third (confidence) field"
-    return correct, errmsg
+        errmsg = "Protein sequence predictions must be after a binding site type specification\nexample:\n{RNA, DNA, METAL}\n0.00, 0.01, 0.51, 0.81, 0.50"
+    else:
+        correct = False
+        errmsg = "Your submission file is not formatted correctly"
+    return correct, errmsg, current_prediction
 
 def end_check(inrec):
     correct = True
@@ -144,12 +171,19 @@ def handle_error(correct, errmsg, inrec):
         raise ValueError, errmsg
 
 def cafa_checker(infile):
+    """
+    Main program that: 1. identifies fields; 2. Calls the proper checker function; 3. calls the
+    error handler "handle_error" which raises a ValueError
+    """
     visited_states = []
     s_token = 0
     n_accuracy = 0
     first_prediction = True
     first_accuracy = True
     first_keywords = True
+    current_line = ""
+    previous_line = ""
+    current_prediction = []
     n_models = 0
     for inline in infile:
         inrec = [i.strip() for i in inline.split()]
@@ -166,7 +200,7 @@ def cafa_checker(infile):
         elif field1 == "END":
             state = "end"
         else: #default to prediction state
-            state = "hpo_prediction"
+            state = "binding_site"
 #        print "****"
 #        print "FIELD1", field1
 #        print inline, state
@@ -199,8 +233,8 @@ def cafa_checker(infile):
                 handle_error(False, "ACCURACY: too many ACCURACY records")
             else:
                 correct, errmsg = accuracy_check(inline)
-        elif state == "hpo_prediction":
-            correct, errmsg = hpo_prediction_check(inline)
+        elif state == "binding_site":
+            correct, errmsg, current_prediction = binding_site_prediction_check(inline, current_prediction)
             handle_error(correct, errmsg,inline)
             if first_prediction:
                 visited_states.append(state)
@@ -215,10 +249,11 @@ def cafa_checker(infile):
         visited_states != legal_states3):
         print visited_states
         print "file not formatted according to CAFA specs"
+        print "Check whether all these record types are in your file"
         print "Check whether all these record types are in your file in the correct order"
         print "AUTHOR, MODEL, KEYWORDS, ACCURACY (optional), predictions, END"
         raise ValueError
     else:
-        print "\nYour input file passed the CAFA 3 HPO predictions format checker\n"
+        print "\nYour input file passed the CAFA 3 binding site format checker\n"
 
 
