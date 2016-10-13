@@ -151,7 +151,7 @@ def cafa_checker(infile):
     first_accuracy = True
     first_keywords = True
     n_models = 0
-    for inline in infile:
+    for inline in open(infile,'r'):
         inrec = [i.strip() for i in inline.split()]
         field1 = inrec[0]
         # Check which field type (state) we are in
@@ -219,6 +219,12 @@ def cafa_checker(infile):
         print "AUTHOR, MODEL, KEYWORDS, ACCURACY (optional), predictions, END"
         raise ValueError
     else:
-        print "\nYour input file passed the CAFA 3 HPO predictions format checker\n"
-
+        print "Your input file passed the CAFA 2 format checker"
+def usage():
+    print "Usage: cafa_hpo_format_checker infile"
+if __name__ == '__main__':
+    try:
+        cafa_checker(sys.argv[1])
+    except IndexError:
+        usage()
 
