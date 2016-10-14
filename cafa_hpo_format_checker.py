@@ -238,6 +238,6 @@ def cafa_checker(infile, fileName):
         errmsg += "AUTHOR, MODEL, KEYWORDS, ACCURACY (optional), predictions, END"
         return False, errmsg
     else:
-        return True, "\nInput file %s passed the CAFA 3 HPO prediction format checker" % fileName
+        return True, "%s, passed the CAFA 3 HPO prediction format checker" % fileName
 
 
