@@ -151,6 +151,11 @@ def end_check(inrec):
         errmsg = "END: record should include the word END only"
     return correct, errmsg
 
+
+"""
+Function builds the error message to incorporate the filename and what line the error was raised on.
+Returns the status of whether the line is correct and the error message if one exists.
+"""
 def handle_error(correct, errmsg, inrec, line_num, fileName):
     if not correct:
         line = "Error in %s, line %s, " % (fileName, line_num)
@@ -161,7 +166,8 @@ def handle_error(correct, errmsg, inrec, line_num, fileName):
 def cafa_checker(infile, fileName):
     """
     Main program that: 1. identifies fields; 2. Calls the proper checker function; 3. calls the
-    error handler "handle_error" which raises a ValueError
+    error handler "handle_error" which builds the error report.  If correct is False, the function returns correct, errmsg
+    to the file_name_check function in cafa3_format_checker.
     """
     visited_states = []
     s_token = 0

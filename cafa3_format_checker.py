@@ -29,7 +29,9 @@ go = go.cafa_checker
 import cafa_binding_site_format_checker as bind
 bind = bind.cafa_checker
 
+
 """
+function go_hpo_predictions()
 Files are sent here from the main function if there are three fields seperated by '_' in the input filename.
 function purpose:
     1. check that the third field is an integer and is between 1 and 3.
@@ -38,7 +40,6 @@ function purpose:
         a. if zipped, opens, unzips, and reads the zipped file into cafa_{go/hpo}_format_checker.cafa_checker
         b. if not zipped, opens file and reads into cafa_{go/hpo}_format_checker.cafa_checker
 """
-
 def go_hpo_predictions(path, fileName):
     features = (fileName.split(".")[0]).split("_")
     if features[0].lower() == "tc":
@@ -67,6 +68,7 @@ def go_hpo_predictions(path, fileName):
 
 
 """
+function binding_sites()
 Files are sent here from the main function if there are four fields seperated by '_' in the input filename.
 function purpose:
     1. check that the fourth field is 'binding'.
@@ -96,7 +98,7 @@ def binding_sites(path, fileName):
 """
 HPO and GO predictions are supposed to be team_model#_taxonID/HPO
 Term Centric GO predictions are supposed to be tc_team_model#_taxonID
-Binding site predictions are supposed to be team_model#_taxonID/HPO
+Binding site predictions are supposed to be team_model#_taxonID_binding
 Checks how many fields seperated by '_' counted, and sent to the proper checker function
 
 Function purpose:
@@ -132,10 +134,10 @@ def file_name_check(infile, fileName):
 
 function purpose:
     1. Checks to see if the submission is a zipped archive or not.
-    2. opens files and sends them to the file_name_check function
-    3. 
+    2. Checks to see if the submission is a unzipped directory.  If it is, returns False
+    3. opens files and sends them to the file_name_check function
     4. Builds an error report and prints it out when validation is finished
-    
+    5. Checks to see if all the files are the same type of prediction.  Return False
 """
 
 def cafa_checker(input_file):
