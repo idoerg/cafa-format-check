@@ -23,6 +23,7 @@ Based on the filename structure, the program will run cafa_binding_site_format_c
 Authored by Iddo Friedberg and Tim Bergquist. Distributed under GPLv3 license (attached)
 
 Contact: idoerg@gmail.com
+
 Contact: trberg@uw.edu
 
 *Important*: If you are participating in CAFA3, you should subscribe to the afp-cafa
