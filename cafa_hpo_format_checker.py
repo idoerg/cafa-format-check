@@ -138,12 +138,14 @@ def end_check(inrec):
         errmsg = "END: record should include the word END only"
     return correct, errmsg
 
-def handle_error(correct, errmsg, inrec):
+def handle_error(correct, errmsg, inrec, line_num, fileName):
     if not correct:
-        print inrec
-        raise ValueError, errmsg
+        line = "Error in %s, line %s, " % (fileName, line_num)
+        return False,  line + errmsg
+    else:
+        return True, "Nothing wrong here"
 
-def cafa_checker(infile):
+def cafa_checker(infile, fileName):
     visited_states = []
     s_token = 0
     n_accuracy = 0
@@ -151,7 +153,9 @@ def cafa_checker(infile):
     first_accuracy = True
     first_keywords = True
     n_models = 0
-    for inline in open(infile,'r'):
+    line_num = 0
+    for inline in infile:
+        line_num += 1
         inrec = [i.strip() for i in inline.split()]
         field1 = inrec[0]
         # Check which field type (state) we are in
@@ -173,15 +177,19 @@ def cafa_checker(infile):
         # Check for errors according to state
         if state == "author":
             correct,errmsg = author_check(inline)
-            handle_error(correct, errmsg,inline)
+            correct, errmsg = handle_error(correct, errmsg, inline, line_num, fileName)
+            if not correct:
+                return correct, errmsg
             visited_states.append(state)
         elif state == "model":
             n_models += 1
             n_accuracy = 0
             if n_models > 3:
-                raise ValueError, "Too many models. Only up to 3 allowed"
+                return False, "Too many models. Only up to 3 allowed"
             correct,errmsg = model_check(inline)
-            handle_error(correct, errmsg,inline)
+            correct, errmsg = handle_error(correct, errmsg, inline, line_num, fileName)
+            if not correct:
+                return correct, errmsg
             if n_models == 1:
                 visited_states.append(state)
         elif state == "keywords":
@@ -189,42 +197,47 @@ def cafa_checker(infile):
                 visited_states.append(state)
                 first_keywords = False
             correct, errmsg = keywords_check(inline)
-            handle_error(correct, errmsg,inline)
+            correct, errmsg = handle_error(correct, errmsg, inline, line_num, fileName)
+            if not correct:
+                return correct, errmsg
         elif state == "accuracy":
             if first_accuracy:
                 visited_states.append(state)
                 first_accuracy = False
             n_accuracy += 1
             if n_accuracy > 3:
-                handle_error(False, "ACCURACY: too many ACCURACY records")
+                correct, errmsg = handle_error(False, "ACCURACY: too many ACCURACY records", inline, line_num, fileName)
+                if not correct:
+                    return correct, errmsg
             else:
                 correct, errmsg = accuracy_check(inline)
+                if not correct:
+                    return correct, errmsg
         elif state == "hpo_prediction":
             correct, errmsg = hpo_prediction_check(inline)
-            handle_error(correct, errmsg,inline)
+            correct, errmsg = handle_error(correct, errmsg, inline, line_num, fileName)
+            if not correct:
+                return correct, errmsg
             if first_prediction:
                 visited_states.append(state)
                 first_prediction = False
         elif state == "end":
             correct, errmsg = end_check(inline)
-            handle_error(correct, errmsg,inline)
+            correct, errmsg = handle_error(correct, errmsg, inline, line_num, fileName)
+            if not correct:
+                return correct, errmsg
             visited_states.append(state)
     # End file forloop
     if (visited_states != legal_states1 and
         visited_states != legal_states2 and
         visited_states != legal_states3):
-        print visited_states
-        print "file not formatted according to CAFA specs"
-        print "Check whether all these record types are in your file in the correct order"
-        print "AUTHOR, MODEL, KEYWORDS, ACCURACY (optional), predictions, END"
-        raise ValueError
+        errmsg = "Error in " + fileName + "\n"
+        errmsg += "Sections found in the file: [" + ", ".join(visited_states) + "]\n"
+        errmsg += "file not formatted according to CAFA 3 specs\n"
+        errmsg += "Check whether all these record types are in your file in the correct order\n"
+        errmsg += "AUTHOR, MODEL, KEYWORDS, ACCURACY (optional), predictions, END"
+        return False, errmsg
     else:
-        print "Your input file passed the CAFA 2 format checker"
-def usage():
-    print "Usage: cafa_hpo_format_checker infile"
-if __name__ == '__main__':
-    try:
-        cafa_checker(sys.argv[1])
-    except IndexError:
-        usage()
+        return True, "\nInput file %s passed the CAFA 3 HPO prediction format checker" % fileName
+
 
