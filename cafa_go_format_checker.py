@@ -20,7 +20,7 @@ pr_field = re.compile("^PR=[0,1]\.[0-9][0-9];$")
 rc_field = re.compile("^RC=[0,1]\.[0-9][0-9]$")
 go_field = re.compile("^GO:[0-9]{5,7}$")
 # Fix to add EFI and HP
-target_field = re.compile("^(T|EFI)[0-9]{5,20}$")
+target_field = re.compile("^(MT|EFI)[0-9]{5,20}$")
 #target_field = re.compile("^T[0-9]{5,20}$")
 confidence_field = re.compile("^[0,1]\.[0-9][0-9]$")
 
