@@ -113,8 +113,10 @@ def file_name_check(infile, fileName):
     
     features = fileName.split(".")[0].split("_")
     if len(features) == 3:
-        return tuple(["GO/HPO Prediction"]) + go_hpo_predictions(infile, fileName)
-
+        if features[2].lower() != "moon":
+            return tuple(["GO/HPO Prediction"]) + go_hpo_predictions(infile, fileName)
+        elif features[2].lower() == "moon":
+            return tuple(["Moonlighting Protein Prediction"]) + go_hpo_predictions(infile, fileName)
     elif len(features) == 4:
         if features[0].lower() == "tc":
             #print "File %s is being treated as a Term Centric GO and moonlighting proteins prediction\n" % fileName
@@ -124,10 +126,10 @@ def file_name_check(infile, fileName):
             return tuple(["Binding Site Prediction"]) + binding_sites(infile, fileName)
     
     elif len(features) < 3:
-        return None, False, "Error in %s\nThere are not enough fields seperated by '_' to the left of .{txt/zip} in the filename\nFor the default HPO and GO predictions, the filename should be three fields, team_model#_{taxonID/hpo}\nFor Term Centric GO predictions, the filename should be four fields, TC_team_model#_taxonID\nFor binding site predictions, filename should be four fields, team_model#_taxonID_binding" % fileName
+        return None, False, "Error in %s\nThere are not enough fields seperated by '_' to the left of .{txt/zip} in the filename\nFor the default HPO and GO predictions, the filename should be three fields, team_model#_{taxonID/hpo}\nFor Term Centric GO predictions, the filename should be four fields, TC_team_model#_taxonID\nFor binding site predictions, filename should be four fields, team_model#_taxonID_binding, For moonlighting protein predictions filename should be three fields, team_model#_moon" % fileName
         
     else:
-        return None, False, "Error in %s\nThere are too many fields seperated by '_' to the left of .{txt/zip} in the filename\nFor the default HPO and GO predictions, the filename should be three fields, team_model#_{taxonID/hpo}\nFor Term Centric GO and moonlighting protein predictions, the filename should be four fields, TC_team_model#_taxonID\nFor binding site predictions, filename should be four fields, team_model#_taxonID_binding" % fileName
+        return None, False, "Error in %s\nThere are too many fields seperated by '_' to the left of .{txt/zip} in the filename\nFor the default HPO and GO predictions, the filename should be three fields, team_model#_{taxonID/hpo}\nFor Term Centric GO and moonlighting protein predictions, the filename should be four fields, TC_team_model#_taxonID\nFor binding site predictions, filename should be four fields, team_model#_taxonID_binding, For moonlighting protein predictions filename should be three fields, team_model#_moon" % fileName
 
 
 """
