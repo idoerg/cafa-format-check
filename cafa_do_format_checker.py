@@ -13,7 +13,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import re
-from .cafa_go_format_checker import (
+from cafa_go_format_checker import (
     target_field,
     confidence_field,
     author_check,
@@ -41,7 +41,7 @@ def do_prediction_check(input_record):
     except ValueError:
         # Wrong number of values in the list
         is_correct = False
-        error_msg = "{} wrong number of fields. Should be 3".format(error_msg_prefix)
+        error_msg = "{} wrong number of fields. Should be 3, not {}".format(error_msg_prefix, len(input_record.split()))
         return is_correct, error_msg
 
     # if len(fields) != 3:
@@ -56,7 +56,7 @@ def do_prediction_check(input_record):
     elif not confidence_field.match(confidence_value):
         is_correct = False
         error_msg = "error in third (confidence) field"
-    elif float(confidence_field) > 1.0:
+    elif float(confidence_value) > 1.0:
         is_correct = False
         error_msg = "error in third (confidence) field. Cannot be > 1.0"
 
@@ -66,16 +66,19 @@ def do_prediction_check(input_record):
     return is_correct, error_msg
 
 
-def cafa_checker(input_file_handle, filename):
+def cafa_checker(input_file_handle, filename=None):
     """
     Main program that: 1. identifies fields; 2. Calls the proper checker function; 3. calls the
     error handler "handle_error" which builds the error report.  If correct is False, the function returns correct, errmsg
     to the file_name_check function in cafa3_format_checker.
     """
-    # Legal states: the CAFA prediction records fields, and their order. KEYWORDS and ACCURACY are optional
-    # legal_states1 = ["author", "model", "keywords", "accuracy", "do_prediction", "end"]
-    # legal_states2 = ["author", "model", "keywords", "do_prediction", "end"]
-    # legal_states3 = ["author", "model", "do_prediction", "end"]
+
+    # TODO: For the longterm, the filename param should be dropped.
+    #  For the short-term, I'm keeping it so the function
+    #  signature remains similar to the other checker functions, but making the filename param optional
+    if filename is None:
+        filename = input_file_handle.name
+
     visited_states = []
     accuracy_count = 0
     model_count = 0
@@ -117,23 +120,14 @@ def cafa_checker(input_file_handle, filename):
 
             if state not in visited_states:
                 visited_states.append(state)
-            """ 
-            if first_keywords:
-                visited_states.append(state)
-                first_keywords = False
-            """
+
             is_correct, error_msg = keywords_check(input_line)
             is_correct, error_msg = handle_error(
-                is_correct, error_msg, input_line, line_num, filename
+                is_correct, error_msg, input_line, line_index, filename
             )
             if not is_correct:
                 return is_correct, error_msg
         elif state == "accuracy":
-            """
-            if first_accuracy:
-                visited_states.append(state)
-                first_accuracy = False
-            """
             if state not in visited_states:
                 visited_states.append(state)
 
@@ -167,19 +161,13 @@ def cafa_checker(input_file_handle, filename):
             visited_states.append(state)
 
     # End file forloop
-    # if (
-    #    visited_states != legal_states1
-    #    and visited_states != legal_states2
-    #    and visited_states != legal_states3
-    # ):
 
     # At this point the various states have been individually validated,
     # finally, check that the required states are all accounted for:
-
     if (
         visited_states[0] != "author"
         or visited_states[1] != "model"
-        or visited_states[2] != "do_prediction"
+        or visited_states[-2] != "do_prediction"
         or visited_states[-1] != "end"
     ):
 
@@ -188,7 +176,7 @@ def cafa_checker(input_file_handle, filename):
         error_msg += "file not formatted according to CAFA {cafa_version} specs\n".format(
             cafa_version=CAFA_VERSION
         )
-        error_msg += "Check whether all these record types are in your file in the correct order\n"
+        error_msg += "Check if all these record types are in your file in the correct order\n"
         error_msg += (
             "AUTHOR, MODEL, KEYWORDS (optional), ACCURACY (optional), predictions, END"
         )
@@ -200,3 +188,21 @@ def cafa_checker(input_file_handle, filename):
                 filename=filename, cafa_version=CAFA_VERSION
             ),
         )
+
+
+def main():
+    import sys
+
+    try:
+        filepath = sys.argv[1]
+
+        with open(filepath, "r") as do_handle:
+            is_valid, error_msg = cafa_checker(do_handle)
+            print("Is Valid: {}".format(is_valid))
+            print("Message: {}".format(error_msg))
+    except IndexError:
+        print("No file specified")
+
+
+if __name__ == "__main__":
+    main()
