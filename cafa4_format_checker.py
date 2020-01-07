@@ -22,6 +22,7 @@ import os
 
 from cafa_hpo_format_checker import cafa_checker as hpo
 from cafa_go_format_checker import cafa_checker as go
+from cafa_do_format_checker import cafa_checker as do_checker
 from cafa_binding_site_format_checker import cafa_checker as bind
 
 
@@ -67,6 +68,10 @@ def go_hpo_predictions(path, fileName):
         )
     if taxon == "hpo":
         return hpo(path, fileName)
+    if taxon == "do":
+        return do_checker(path)
+
+
     else:
         return go(path, fileName)
 
@@ -172,18 +177,15 @@ def file_name_check(infile, fileName):
         )
 
 
-"""
-
-function purpose:
-    1. Checks to see if the submission is a zipped archive or not.
-    2. Checks to see if the submission is a unzipped directory.  If it is, returns False
-    3. opens files and sends them to the file_name_check function
-    4. Builds an error report and prints it out when validation is finished
-    5. Checks to see if all the files are the same type of prediction.  Return False
-"""
-
-
 def cafa_checker(input_file):
+    """
+    function purpose:
+        1. Checks to see if the submission is a zipped archive or not.
+        2. Checks to see if the submission is a unzipped directory.  If it is, returns False
+        3. opens files and sends them to the file_name_check function
+        4. Builds an error report and prints it out when validation is finished
+        5. Checks to see if all the files are the same type of prediction.  Return False
+    """
     # holds all returned boolean variables and the error messages.
     REPORT = []
 
