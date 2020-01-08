@@ -2,13 +2,21 @@ import os
 from zipfile import ZipFile
 import pytest
 from cafa_do_format_checker import author_check, model_check, keywords_check
-from cafa_validation_utils import validate_one_team_per_archive
+from cafa_validation_utils import validate_one_team_per_archive, validate_archive_name
 
 @pytest.fixture(scope="module")
 def test_data_path():
     ''' Provides a single, consistent absolute path to the test_data directory across environments '''
     root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     return "{}/test/test_data/end_to_end_data/".format(root_path)
+
+
+def test_validate_archive_name_happy_path(test_data_path):
+    ''' Test the validate_archive_name() function from cafa_validation_utils '''
+    zip_path = "{}valid/ateam_.zip".format(test_data_path)
+    validation_result = validate_archive_name(zip_path)
+    assert validation_result[0] is True
+    assert validation_result[1] == validation_result[2]
 
 
 def test_one_team_per_archive_happy_path(test_data_path):
