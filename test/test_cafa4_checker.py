@@ -78,3 +78,11 @@ def test_invalid_protein_centric_zip(test_data_path, capfd):
     assert is_valid is False
 
 
+def test_invalid_binding_site_zip(test_data_path, capfd):
+    filepath = "{}invalid/binding_site_test_predictions.zip".format(test_data_path)
+    is_valid = cafa_checker(filepath)
+    # Capture print statements to stdout
+    output, error = capfd.readouterr()
+    assert is_valid is False
+
+
