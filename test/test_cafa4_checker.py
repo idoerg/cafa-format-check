@@ -61,3 +61,20 @@ def test_go_and_do_zip_file(test_data_path, capfd):
     assert "ateam_1_do.txt, passed the CAFA 4 DO prediction format checker" in output
     assert "ateam_1_go.txt, passed the CAFA 4 GO prediction format checker" in output
 
+
+def test_invalid_term_centric_zip(test_data_path, capfd):
+    filepath = "{}invalid/term_centric_test_predictions.zip".format(test_data_path)
+    is_valid = cafa_checker(filepath)
+    # Capture print statements to stdout
+    output, error = capfd.readouterr()
+    assert is_valid is False
+
+
+def test_invalid_protein_centric_zip(test_data_path, capfd):
+    filepath = "{}invalid/protein_centric_test_predictions.zip".format(test_data_path)
+    is_valid = cafa_checker(filepath)
+    # Capture print statements to stdout
+    output, error = capfd.readouterr()
+    assert is_valid is False
+
+
