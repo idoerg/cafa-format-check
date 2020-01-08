@@ -1,4 +1,38 @@
+import os
+from zipfile import ZipFile
+import pytest
 from cafa_do_format_checker import author_check, model_check, keywords_check
+from cafa_validation_utils import validate_one_team_per_archive
+
+@pytest.fixture(scope="module")
+def test_data_path():
+    ''' Provides a single, consistent absolute path to the test_data directory across environments '''
+    root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    return "{}/test/test_data/end_to_end_data/".format(root_path)
+
+
+def test_one_team_per_archive_happy_path(test_data_path):
+    ''' Test that an archive containing files with a consistent single team name in the filenames passes
+     the one team per archive validation
+     '''
+    zip_path = "{}valid/go_and_do.zip".format(test_data_path)
+
+    with ZipFile(zip_path, "r") as zip_handle:
+        is_valid, team_name_count, team_names = validate_one_team_per_archive(zip_handle)
+        assert is_valid is True
+        assert team_name_count == 1
+
+def test_one_team_per_archive_invalid_input(test_data_path):
+    ''' Test that an archive containing files with multiple team names in the filenames
+    fails the one team per archive validation
+     '''
+    zip_path = "{}invalid/mixed_predictions.zip".format(test_data_path)
+
+    with ZipFile(zip_path, "r") as zip_handle:
+        is_valid, team_name_count, team_names = validate_one_team_per_archive(zip_handle)
+        assert is_valid is False
+        assert team_name_count == 7
+
 
 
 def test_valid_author_str():

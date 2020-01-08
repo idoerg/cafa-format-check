@@ -24,7 +24,7 @@ from cafa_hpo_format_checker import cafa_checker as hpo
 from cafa_go_format_checker import cafa_checker as go
 from cafa_do_format_checker import cafa_checker as do_checker
 from cafa_binding_site_format_checker import cafa_checker as bind
-
+from cafa_validation_utils import validate_one_team_per_archive
 
 CAFA_VERSION = 4
 
@@ -203,6 +203,20 @@ def cafa_checker(input_file):
     print("____________________________________________")
     if zipfile.is_zipfile(input_file):
         files = zipfile.ZipFile(input_file, "r")
+
+        # Check that only a single team is represented within the archive based on the archived filenames:
+        is_valid, team_count, team_names = validate_one_team_per_archive(files)
+
+        if not is_valid:
+            print("\nVALIDATION FAILED")
+            print("Only one team is allowed per zipfile")
+            print("The following team names were found:")
+            for team_name in team_names:
+                print(team_name)
+            return False
+
+
+
         names = files.namelist()
         names = [
             name
