@@ -73,8 +73,9 @@ def go_hpo_predictions(path, fileName):
     if taxon == "hpo":
         return hpo(path, fileName)
     if taxon == "do":
-        return do_checker(path)
-
+        # TODO: do_checker doesn't work with zip files if the fileName is not passed.
+        #  What's up with that?
+        return do_checker(path, fileName)
 
     else:
         return go(path, fileName)
