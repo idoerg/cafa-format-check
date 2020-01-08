@@ -55,7 +55,7 @@ def test_mixed_predictions_zip_file(test_data_path, capfd):
 
 
 def test_go_and_do_zip_file(test_data_path, capfd):
-    filepath = "{}valid/go_and_do.zip".format(test_data_path)
+    filepath = "{}valid/ateam_.zip".format(test_data_path)
     is_valid = cafa_checker(filepath)
     # Capture print statements to stdout
     output, error = capfd.readouterr()

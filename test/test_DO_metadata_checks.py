@@ -15,7 +15,7 @@ def test_one_team_per_archive_happy_path(test_data_path):
     ''' Test that an archive containing files with a consistent single team name in the filenames passes
      the one team per archive validation
      '''
-    zip_path = "{}valid/go_and_do.zip".format(test_data_path)
+    zip_path = "{}valid/ateam_.zip".format(test_data_path)
 
     with ZipFile(zip_path, "r") as zip_handle:
         is_valid, team_name_count, team_names = validate_one_team_per_archive(zip_handle)
