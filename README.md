@@ -1,5 +1,5 @@
 
-This repository contains two Python scripts for checking the format of 
+This repository contains Python scripts for checking the format of 
 prediction files for CAFA4
 
 For more information on CAFA  see: http://biofunctionprediction.org
