@@ -29,22 +29,3 @@ def validate_archive_name(filepath):
             return is_valid, team_count, team_names
         else:
             return zip_team_name == team_names[0], zip_team_name, team_names[0]
-
-
-def main():
-    import sys
-
-    try:
-        zip_path = sys.argv[1]
-
-        with ZipFile(zip_path, "r") as zip_handle:
-            result = validate_one_team_per_archive(zip_handle)
-            print(result)
-
-    except IndexError:
-        print("Please pass a zip filename")
-
-if __name__ == "__main__":
-    main()
-
-
