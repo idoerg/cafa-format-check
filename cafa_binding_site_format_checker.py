@@ -273,11 +273,11 @@ def cafa_checker(infile, fileName):
         visited_states != legal_states3):
         errmsg = "Error in " + fileName + "\n"
         errmsg += "Sections found in the file: [" + ", ".join(visited_states) + "]\n"
-        errmsg += "file not formatted according to CAFA 3 specs\n"
+        errmsg += "file not formatted according to CAFA 4 specs\n"
         errmsg += "Check whether all these record types are in your file in the correct order\n"
         errmsg += "AUTHOR, MODEL, KEYWORDS, ACCURACY (optional), predictions, END"
         return False, errmsg
     else:
-        return True, "%s, passed the CAFA 3 binding site format checker" % fileName
+        return True, "%s, passed the CAFA 4 binding site format checker" % fileName
 
 
