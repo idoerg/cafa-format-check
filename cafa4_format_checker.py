@@ -29,7 +29,10 @@ from cafa_binding_site_format_checker import cafa_checker as bind
 CAFA_VERSION = 4
 
 """
-function go_hpo_predictions()
+function go_hpo_predictions((
+            None,
+            False,
+            "Error in %s\nThere are not enough fields)
 Files are sent here from the main function if there are three fields seperated by '_' in the input filename.
 function purpose:
     1. check that the third field is an integer and is between 1 and 3.
@@ -66,6 +69,7 @@ def go_hpo_predictions(path, fileName):
             "Error in %s\nModel number in file name incorrect, you may only submit one to three models\nFormat should be teamId_model#_taxonId/hpo.txt"
             % fileName,
         )
+
     if taxon == "hpo":
         return hpo(path, fileName)
     if taxon == "do":
@@ -221,9 +225,10 @@ def cafa_checker(input_file):
     else:
         infile = open(input_file, "r")
         filename = input_file.split("/")[-1]
-        print("Validating", filename)
+        print("Validating {}".format(filename))
         # print file_name_check(infile, filename)
         file_type, correct, errmsg = file_name_check(infile, filename)
+
         FLAGS.append(correct)
         REPORT.append((correct, errmsg))
         TYPES.append(file_type)
