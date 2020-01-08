@@ -47,6 +47,7 @@ def test_mixed_predictions_zip_file(test_data_path, capfd):
     # should appear 7 times in stdout:
     counter = Counter(output.split())
     assert counter['passed'] == 7
+    assert error == ""
 
 
 def test_go_and_do_zip_file(test_data_path, capfd):
@@ -55,6 +56,7 @@ def test_go_and_do_zip_file(test_data_path, capfd):
     # Capture print statements to stdout
     output, error = capfd.readouterr()
     assert is_valid is True
+    assert error == ""
     assert "Files correctly formatted" in output
     assert "ateam_1_do.txt, passed the CAFA 4 DO prediction format checker" in output
     assert "ateam_1_go.txt, passed the CAFA 4 GO prediction format checker" in output
