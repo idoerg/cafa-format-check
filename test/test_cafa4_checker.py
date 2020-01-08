@@ -54,6 +54,19 @@ def test_mixed_predictions_zip_file(test_data_path, capfd):
     #assert error == ""
 
 
+def test_valid_teamXYZ_zip_file(test_data_path, capfd):
+    filepath = "{}valid/teamXYZ.zip".format(test_data_path)
+    is_valid = cafa_checker(filepath)
+    # Capture print statements to stdout
+    output, error = capfd.readouterr()
+    assert is_valid is True
+    assert error == ""
+    assert "Files correctly formatted" in output
+    assert "teamXYZ_1_9606.txt, passed the CAFA 4 GO prediction format checker" in output
+    assert "teamXYZ_1_hpo.txt, passed the CAFA 4 HPO prediction format checker" in output
+    assert "teamXYZ_3_9606_binding.txt, passed the CAFA 4 binding site format checker" in output
+
+
 def test_go_and_do_zip_file(test_data_path, capfd):
     filepath = "{}valid/ateam_.zip".format(test_data_path)
     is_valid = cafa_checker(filepath)

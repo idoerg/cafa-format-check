@@ -19,7 +19,7 @@ def validate_archive_name(filepath):
     Also, compares the teamname found in the zipfile name to the teamname(s)
     of the files found within the zip.
     """
-    zip_team_name = filepath.split("/")[-1].split("_")[0]
+    zip_team_name = filepath.rstrip(".zip").split("/")[-1].split("_")[0]
 
     with ZipFile(filepath, "r") as zip_handle:
         is_valid, team_count, team_names = validate_one_team_per_archive(zip_handle)
