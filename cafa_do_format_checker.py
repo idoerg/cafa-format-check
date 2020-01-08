@@ -76,6 +76,7 @@ def cafa_checker(input_file_handle, filename=None):
     # TODO: For the longterm, the filename param should be dropped.
     #  For the short-term, I'm keeping it so the function
     #  signature remains similar to the other checker functions, but making the filename param optional
+    # It turns out that filename is problematic with zip files, look into that before dropping the param...
     if filename is None:
         filename = input_file_handle.name
 
