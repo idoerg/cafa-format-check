@@ -1,4 +1,5 @@
 from zipfile import ZipFile
+import re
 '''
 This file contains various utility functions for validating the format
 of CAFA submissions
@@ -20,6 +21,10 @@ def validate_archive_name(filepath):
     of the files found within the zip.
     """
     zip_team_name = filepath.rstrip(".zip").split("/")[-1].split("_")[0]
+
+    if not re.match('^\w+$', zip_team_name):
+        return False, None, None
+
 
     with ZipFile(filepath, "r") as zip_handle:
         is_valid, team_count, team_names = validate_one_team_per_archive(zip_handle)

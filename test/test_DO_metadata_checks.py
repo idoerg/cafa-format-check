@@ -18,6 +18,13 @@ def test_validate_archive_name_happy_path(test_data_path):
     assert validation_result[0] is True
     assert validation_result[1] == validation_result[2]
 
+def test_validate_archive_name_with_bad_chars():
+    ''' Test that a poorly named zip file would fail validation '''
+    bad_str = "foo bar_.zip"
+    validate_result = validate_archive_name(bad_str)
+    assert validate_result[0] is False
+
+
 
 def test_one_team_per_archive_happy_path(test_data_path):
     ''' Test that an archive containing files with a consistent single team name in the filenames passes
