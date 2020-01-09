@@ -59,6 +59,11 @@ def test_valid_teamXYZ_zip_file(test_data_path, capfd):
     is_valid = cafa_checker(filepath)
     # Capture print statements to stdout
     output, error = capfd.readouterr()
+
+    print("")
+    print(output)
+    print("")
+
     assert is_valid is True
     assert error == ""
     assert "Files correctly formatted" in output

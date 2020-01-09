@@ -55,8 +55,11 @@ def go_hpo_predictions(path, fileName):
             )
 
     else:
-        taxon = features[2].lower()
+        taxon = features[-1].lower()
+        #taxon = features[2].lower()
         modelNum = features[1][-1]
+
+    print(path, taxon)
 
     try:
         modelNum = int(modelNum)
@@ -76,9 +79,13 @@ def go_hpo_predictions(path, fileName):
         # TODO: do_checker doesn't work with zip files if the fileName is not passed.
         #  What's up with that?
         return do_checker(path, fileName)
-
-    else:
+    elif taxon == "go":
         return go(path, fileName)
+    else:
+        return (
+            False,
+            "Unknown taxonomy: {}".format(taxon)
+        )
 
 
 """
@@ -143,6 +150,7 @@ Function purpose:
     5. if fields are too large or too small, error messages are returned.
     6. returned boolean,message from the format checkers are return to the main cafa_checker function.
 """
+
 
 
 def file_name_check(infile, fileName):
