@@ -33,7 +33,6 @@ def do_prediction_check(input_record):
     is_correct = True
     error_msg = None
     error_msg_prefix = "DO prediction: "
-    # fields = [i.strip() for i in input_record.split()
 
     try:
         target_value, do_value, confidence_value = [
@@ -49,9 +48,6 @@ def do_prediction_check(input_record):
         )
         return is_correct, error_msg
 
-    # if len(fields) != 3:
-    #    is_correct = False
-    #    error_msg = "DO prediction: wrong number of fields. Should be 3"
     if not target_field.match(target_value):
         is_correct = False
         error_msg = "error in first (Target ID) field"
@@ -105,13 +101,15 @@ def cafa_checker(input_file_handle, filename=None):
 
             # What's the author/team from the filename?
             filename_validator = validate_filename(filename)
-            is_correct, error_msg = validate_author_line(input_line, expected_author=filename_validator.team_name)  #author_check(input_line)
-            is_correct, error_msg = handle_error(
-                is_correct, error_msg, input_line, line_index, filename
-            )
+            is_correct, error_msg = validate_author_line(input_line, expected_author=filename_validator.team_name)
+            #author_check(input_line)
             if not is_correct:
+                is_correct, error_msg = handle_error(
+                    is_correct, error_msg, input_line, line_index, filename
+                )
                 return is_correct, error_msg
-            visited_states.append(state)
+            else:
+                visited_states.append(state)
         elif state == "model":
             model_count += 1
             accuracy_count = 0
