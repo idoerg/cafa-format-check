@@ -70,7 +70,7 @@ def test_invalid_teamXYZ_zip_file(test_data_path, capfd):
 
 def test_go_and_do_zip_file(test_data_path, capfd):
     ''' Tests a simple valid zipfile '''
-    filepath = "{}valid/ateam_.zip".format(test_data_path)
+    filepath = "{}valid/ateam.zip".format(test_data_path)
     print("TESTING {}".format(filepath))
     is_valid = cafa_checker(filepath)
     # Capture print statements to stdout

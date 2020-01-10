@@ -187,7 +187,7 @@ def validate_archive_name(filepath):
     """
     is_valid = True
     message = 'ok'
-    zip_team_name = filepath.rstrip(".zip").split("/")[-1].split("_")[0]
+    zip_team_name = filepath.rstrip(".zip").split("/")[-1].strip() #.split("_")[0]
     parsed_files = None
 
     if not re.match('^\w+$', zip_team_name):

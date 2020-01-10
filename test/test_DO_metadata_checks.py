@@ -38,7 +38,7 @@ def test_validate_author_line_bad():
 
 def test_validate_archive_name_happy_path(test_data_path):
     ''' Test the validate_archive_name() function from cafa_validation_utils '''
-    zip_path = "{}valid/ateam_.zip".format(test_data_path)
+    zip_path = "{}valid/ateam.zip".format(test_data_path)
     validation_result = validate_archive_name(zip_path)
     assert validation_result.is_valid is True
     assert validation_result.team_name == 'ateam' # == validation_result[2]
@@ -55,7 +55,7 @@ def test_one_team_per_archive_happy_path(test_data_path):
     ''' Test that an archive containing files with a consistent single team name in the filenames passes
      the one team per archive validation
      '''
-    zip_path = "{}valid/ateam_.zip".format(test_data_path)
+    zip_path = "{}valid/ateam.zip".format(test_data_path)
 
     with ZipFile(zip_path, "r") as zip_handle:
         is_valid, team_name_count, team_names = validate_one_team_per_archive(zip_handle)
