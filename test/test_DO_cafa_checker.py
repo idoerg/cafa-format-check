@@ -21,7 +21,7 @@ def test_data_path():
 
 
 def test_basic_happy_path_file(test_data_path):
-    filepath = "{}disorder_ontology/basic_valid_DO_example.txt".format(test_data_path)
+    filepath = "{}disorder_ontology/ZZZ_basic_valid_DO_example.txt".format(test_data_path)
 
     with open(filepath, "r") as read_handle:
         is_valid, message = cafa_checker(read_handle)
@@ -32,7 +32,7 @@ def test_basic_happy_path_file(test_data_path):
 def test_invalid_keyword_file(test_data_path):
     ''' Tests that an illegal keyword is caught during validation '''
 
-    filepath = "{}disorder_ontology/bad_keyword_DO_example.txt".format(test_data_path)
+    filepath = "{}disorder_ontology/ZZZ_bad_keyword_DO_example.txt".format(test_data_path)
 
     with open(filepath, "r") as read_handle:
         is_valid, message = cafa_checker(read_handle)
@@ -42,7 +42,7 @@ def test_invalid_keyword_file(test_data_path):
 
 def test_missing_method_line_file(test_data_path):
     ''' Tests that a file with no method data is caught during validation '''
-    filepath = "{}disorder_ontology/missing_model_DO_example.txt".format(test_data_path)
+    filepath = "{}disorder_ontology/ZZZ_missing_model_DO_example.txt".format(test_data_path)
 
     with open(filepath, "r") as read_handle:
         is_valid, message = cafa_checker(read_handle)
@@ -52,6 +52,10 @@ def test_missing_method_line_file(test_data_path):
         # The second line of the message should be something like this:
         # Sections found in the file: [author, keywords, do_prediction, end]
         # So, we will verify that "model" is missing, as expected:
+
+        print("#####################################")
+        print(message_split)
+        #assert True
         assert "model" not in message_split[1]
 
 
@@ -70,7 +74,7 @@ def test_missing_author_line_file(test_data_path):
 
 def test_missing_end_line_file(test_data_path):
     ''' Tests that a file with no END delimiter is caught during validation '''
-    filepath = "{}disorder_ontology/missing_end_DO_example.txt".format(test_data_path)
+    filepath = "{}disorder_ontology/ZZZ_missing_end_DO_example.txt".format(test_data_path)
 
     with open(filepath, "r") as read_handle:
         is_valid, message = cafa_checker(read_handle)

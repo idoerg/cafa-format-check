@@ -3,6 +3,7 @@ from zipfile import ZipFile
 import pytest
 from cafa_do_format_checker import author_check, model_check, keywords_check
 from cafa_validation_utils import validate_one_team_per_archive, validate_archive_name
+from cafa_validation_utils import validate_author_line, validate_filename
 
 @pytest.fixture(scope="module")
 def test_data_path():
@@ -10,13 +11,37 @@ def test_data_path():
     root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     return "{}/test/test_data/end_to_end_data/".format(root_path)
 
+def test_validate_author_line_good():
+    good_values = (
+        "AUTHOR Shakespeare",
+        "AUTHOR testauthor ",
+        "AUTHOR      Plato",
+    )
+
+    for line in good_values:
+        is_valid, message = validate_author_line(line)
+        assert is_valid is True
+        assert message == "ok"
+
+def test_validate_author_line_bad():
+    good_values = (
+        "AUTHOR William Shakespeare",
+        "AUTHOR: testauthor ",
+        "AUTHORS     Plato",
+    )
+
+    for line in good_values:
+        is_valid, message = validate_author_line(line)
+        assert is_valid is False
+        assert message != "ok"
+        print(message)
 
 def test_validate_archive_name_happy_path(test_data_path):
     ''' Test the validate_archive_name() function from cafa_validation_utils '''
     zip_path = "{}valid/ateam_.zip".format(test_data_path)
     validation_result = validate_archive_name(zip_path)
-    assert validation_result[0] is True
-    assert validation_result[1] == validation_result[2]
+    assert validation_result.is_valid is True
+    assert validation_result.team_name == 'ateam' # == validation_result[2]
 
 def test_validate_archive_name_with_bad_chars():
     ''' Test that a poorly named zip file would fail validation '''
@@ -46,7 +71,7 @@ def test_one_team_per_archive_invalid_input(test_data_path):
     with ZipFile(zip_path, "r") as zip_handle:
         is_valid, team_name_count, team_names = validate_one_team_per_archive(zip_handle)
         assert is_valid is False
-        assert team_name_count == 7
+        assert team_name_count == 5
 
 
 
