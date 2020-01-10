@@ -23,6 +23,7 @@ from cafa_go_format_checker import (
     end_check,
     handle_error,
 )
+from cafa_validation_utils import validate_filename, validate_author_line
 
 CAFA_VERSION = 4
 
@@ -41,7 +42,11 @@ def do_prediction_check(input_record):
     except ValueError:
         # Wrong number of values in the list
         is_correct = False
-        error_msg = "{} wrong number of fields. Should be 3, not {}".format(error_msg_prefix, len(input_record.split()))
+        error_msg = '{prefix} In "{input}", wrong number of fields. Should be 3, not {field_count}'.format(
+            prefix=error_msg_prefix,
+            input=input_record,
+            field_count=len(input_record.split())
+        )
         return is_correct, error_msg
 
     # if len(fields) != 3:
@@ -97,7 +102,10 @@ def cafa_checker(input_file_handle, filename=None):
 
         # Check for errors according to state
         if state == "author":
-            is_correct, error_msg = author_check(input_line)
+
+            # What's the author/team from the filename?
+            filename_validator = validate_filename(filename)
+            is_correct, error_msg = validate_author_line(input_line, expected_author=filename_validator.team_name)  #author_check(input_line)
             is_correct, error_msg = handle_error(
                 is_correct, error_msg, input_line, line_index, filename
             )
