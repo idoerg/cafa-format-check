@@ -15,16 +15,12 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import zipfile
-import csv
 import sys
-import re
 import os
-
 from cafa_hpo_format_checker import cafa_checker as hpo
 from cafa_go_format_checker import cafa_checker as go
 from cafa_do_format_checker import cafa_checker as do_checker
-from cafa_binding_site_format_checker import cafa_checker as bind
-from cafa_validation_utils import validate_archive_name
+from cafa_validation_utils import validate_filename, validate_archive_name
 
 CAFA_VERSION = 4
 
@@ -42,7 +38,7 @@ function purpose:
         b. if not zipped, opens file and reads into cafa_{go/hpo}_format_checker.cafa_checker
 """
 
-
+'''
 def go_hpo_predictions(path, fileName):
     features = (fileName.split(".")[0]).split("_")
     if features[0].lower() == "tc":
@@ -86,206 +82,73 @@ def go_hpo_predictions(path, fileName):
             False,
             "Unknown taxonomy: {}".format(taxon)
         )
+'''
 
 
-"""
-function binding_sites()
-Files are sent here from the main function if there are four fields seperated by '_' in the input filename.
-function purpose:
-    1. check that the fourth field is 'binding'.
-    2. check that the third field is an integer and is between 1 and 3.
-    3. check that the second field is not 'hpo'
-    4. sends file to cafa_binding_site_format_checker.py, function cafa_checker
-    5. returned boolean, message is return to file_name_checker
-"""
+def ontology_validator(ontology, read_handle, filepath):
+    """ A helper wrapper around the individual ontology checkers for go, do, hpo """
+    VALIDATORS = {
+        'do': do_checker,
+        'go': go,
+        'hpo': hpo
+    }
+
+    validator = VALIDATORS.get(ontology)
+
+    if validator is None:
+        return False, "Could not process ontology {}".format(ontology)
+
+    is_valid, message = validator(read_handle, filepath)
+    return is_valid, message
 
 
-def binding_sites(path, filename):
-    features = (filename.split(".")[0]).split("_")
-    try:
-        model_count = int(features[1][-1:])
-    except:
-        return False, "{}\nModel number in filename must be integer".format(filename)
-    taxon = features[2].lower()
-    bind_field = features[3].lower()
-    if bind_field != "binding":
-        return (
-            False,
-            "Error in {}\nBinding specification in filename is incorrect.  Binding site prediction filename must be\
-             formatted teamId_model#_taxonId_binding.[txt/zip]\nField four is incorrect, must be 'binding'.".format(
-                filename
-            ),
-        )
-    if model_count < 1 or model_count > 3:
-        return (
-            False,
-            "Error in {}\nModel number in file name incorrect, you may only submit one to three models\nFormat should\
-             be teamId_model#_taxonId/hpo_binding.[txt/zip]".format(
-                filename
-            ),
-        )
-    if taxon == "hpo":
-        return (
-            False,
-            "Error in {}\nBinding site prediction filename cannot have 'hpo' as third field, must be taxon Id.".format(
-                filename
-            ),
-        )
-    else:
-        return bind(path, filename)
-        # return True, "Binding site prediction file has been validated!"
+def cafa4_file_validator(filepath):
+    """ Validates the filenaming of CAFA submissions """
+    is_valid = True
+    filepath_short = filepath.split("/")[-1]
+    message = "VALIDATION SUCCESSFUL\n{filepath} meets CAFA4 file naming specifications".format(filepath=filepath_short)
+    error_preamble = "\nVALIDATION FAILED"
 
+    if filepath.endswith(".txt"):
+        parsed = validate_filename(filepath)
 
-"""
-HPO and GO predictions are supposed to be team_model#_taxonID/HPO
-Term Centric GO predictions are supposed to be tc_team_model#_taxonID
-Binding site predictions are supposed to be team_model#_taxonID_binding
-Checks how many fields seperated by '_' counted, and sent to the proper checker function
-
-Function purpose:
-    1. checks the number of fields seperated by "_"
-    2. if three, file is sent to go_hpo_predictions
-    3. if four, file is checked for "tc" field in first section.
-    4. if tc, file is sent to go_hpo_predictions, if not, file is sent to binding_sites.
-    5. if fields are too large or too small, error messages are returned.
-    6. returned boolean,message from the format checkers are return to the main cafa_checker function.
-"""
-
-
-
-def file_name_check(infile, fileName):
-
-    features = fileName.split(".")[0].split("_")
-    if len(features) == 3:
-        if features[2].lower() != "moon":
-            return tuple(["GO/HPO Prediction"]) + go_hpo_predictions(infile, fileName)
-        elif features[2].lower() == "moon":
-            return tuple(["Moonlighting Protein Prediction"]) + go_hpo_predictions(
-                infile, fileName
-            )
-    elif len(features) == 4:
-        if features[0].lower() == "tc":
-            # print "File %s is being treated as a Term Centric GO and moonlighting proteins prediction\n" % fileName
-            # print go_hpo_predictions(infile, fileName)
-            return tuple(["Term Centric GO Prediction"]) + go_hpo_predictions(
-                infile, fileName
-            )
+        if not parsed.is_valid:
+            message = parsed.message
+            is_valid = False
         else:
-            return tuple(["Binding Site Prediction"]) + binding_sites(infile, fileName)
+            with open(filepath, "r") as read_handle:
+                is_valid, message = ontology_validator(parsed.ontology, read_handle, filepath)
 
-    elif len(features) < 3:
-        return (
-            None,
-            False,
-            "Error in %s\nThere are not enough fields separated by '_' to the left of .{txt/zip} in the filename\nFor the default HPO and GO predictions, the filename should be three fields, team_model#_{taxonID/hpo}\nFor Term Centric GO predictions, the filename should be four fields, TC_team_model#_taxonID\nFor binding site predictions, filename should be four fields, team_model#_taxonID_binding, For moonlighting protein predictions filename should be three fields, team_model#_moon"
-            % fileName,
-        )
-
-    else:
-        return (
-            None,
-            False,
-            "Error in %s\nThere are too many fields seperated by '_' to the left of .{txt/zip} in the filename\nFor the default HPO and GO predictions, the filename should be three fields, team_model#_{taxonID/hpo}\nFor Term Centric GO and moonlighting protein predictions, the filename should be four fields, TC_team_model#_taxonID\nFor binding site predictions, filename should be four fields, team_model#_taxonID_binding, For moonlighting protein predictions filename should be three fields, team_model#_moon"
-            % fileName,
-        )
-
-
-def cafa_checker(input_file):
-    """
-    function purpose:
-        1. Checks to see if the submission is a zipped archive or not.
-        2. Checks to see if the submission is a unzipped directory.  If it is, returns False
-        3. opens files and sends them to the file_name_check function
-        4. Builds an error report and prints it out when validation is finished
-        5. Checks to see if all the files are the same type of prediction.  Return False
-    """
-    # holds all returned boolean variables and the error messages.
-    REPORT = []
-
-    # holds the booleans returned from file_name_checker to see if any of the files return False for correct format
-    FLAGS = []
-
-    # holds all the file types that have been tested so that full zipped files can be checked if they are the same type of file.
-    TYPES = []
-
-    print("____________________________________________")
-    if zipfile.is_zipfile(input_file):
-        files = zipfile.ZipFile(input_file, "r")
-
-        # Check that the zipfile contains the team name and that team name is consistent with the individual
-        # files within the zip:
-        validation_result = validate_archive_name(input_file)
-
-        if validation_result[0] is False:
-            team_names = validation_result[-1]
-            print("\nVALIDATION FAILED")
-            print("Only one team is allowed per zipfile")
-            print("The following team names were found:")
-            for team_name in team_names:
-                print(team_name)
-            return False
-
-        names = files.namelist()
-        names = [
-            name
-            for name in names
-            if "__MACOSX" not in name
-            and not name.endswith("/")
-            and not name.endswith(".DS_Store")
-        ]
-        for name in names:
-            filename = name.split("/")[-1]
-            infile = files.read(name)
-            infile = infile.strip().split(b"\n")
-            print("Validating {}".format(filename))
-            file_type, correct, errmsg = file_name_check(infile, filename)
-            FLAGS.append(correct)
-            REPORT.append((correct, errmsg))
-            TYPES.append(file_type)
-    elif os.path.isdir(input_file):
-        print("\nFolders must be compressed into a zipped archive before submission and validation\n")
-        return
-    else:
-        infile = open(input_file, "r")
-        filename = input_file.split("/")[-1]
-        print("Validating {}".format(filename))
-        # print file_name_check(infile, filename)
-        file_type, correct, errmsg = file_name_check(infile, filename)
-
-        FLAGS.append(correct)
-        REPORT.append((correct, errmsg))
-        TYPES.append(file_type)
-    print("\n")
-
-    if False in FLAGS:
-        print("Files incorrecly formatted:\n")
-        for correct, errmsg in REPORT:
-            if not correct:
-                print(errmsg)
-                print("\n")
-        return False
-
-    if True in FLAGS:
-        print("Files correctly formatted:\n")
-        for correct, errmsg in REPORT:
-            if correct:
-                print(errmsg)
-
-        return True
-    if False not in FLAGS:
-        if len(set(TYPES)) != 1:
-            print("\nZipped archives should only contain one type of prediction")
-            print("The following types of predictions are present:")
-            TYPES = set(TYPES)
-            for file_type in TYPES:
-                print(">", file_type)
-
-            return False
+    elif zipfile.is_zipfile(filepath):
+        # Check that the zipfile contains the team name and that team name is
+        # consistent with the individual files within the zip:
+        validation_result = validate_archive_name(filepath)
+        if validation_result.is_valid is False:
+            message = validation_result.message
+            is_valid = False
 
         else:
-            print("\nAll files are correctly formatted")
-            return True
-    print("____________________________________________")
+            # we need to validate the contained txt files:
+
+            for child_file in validation_result.files:
+                zip_reader = zipfile.ZipFile(filepath)
+                file_contents = zip_reader.open(child_file.filename, 'r')
+                child_file_is_valid, child_file_message = ontology_validator(child_file.ontology, file_contents, child_file.filename)
+
+                if not child_file_is_valid:
+                    is_valid = False
+                    message = child_file_message
+                    break
+
+    else:
+        is_valid = False
+        message = "Could not parse {filepath}".format(filepath=filepath_short)
+
+    if not is_valid:
+        print(error_preamble)
+
+    print(message)
+    return is_valid
 
 
 def usage():
@@ -294,6 +157,6 @@ def usage():
 
 if __name__ == "__main__":
     try:
-        cafa_checker(sys.argv[1])
+        cafa4_file_validator(sys.argv[1])
     except IndexError:
         usage()
