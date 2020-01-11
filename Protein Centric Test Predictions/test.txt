@@ -1,8 +1,0 @@
-AUTHOR FooBar
-MODEL 1
-KEYWORDS sequence alignment, protein interactions, gene expression, literature, machine learning, other functional information.
-T96060011502	HP:0000006	1.00
-T96060006172	HP:0000006	0.99
-T96060018207	HP:0000006	0.98
-T96060002897	HP:0000010	0.85
-END
