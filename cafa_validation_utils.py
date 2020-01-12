@@ -136,7 +136,7 @@ def validate_filename(filename):
     # We can now move forward with validating each piece of metadata:
     if is_valid is True:
         # What to do about team name:
-        if not re.match('^\w+$', team_name):
+        if not re.match(r'^\w+$', team_name):
             is_valid = False
             message = "With file {filename}, {team_name} is not a valid team name".format(filename=filename, team_name=team_name)
 
@@ -190,7 +190,7 @@ def validate_archive_name(filepath):
     zip_team_name = filepath.rstrip(".zip").split("/")[-1].strip() #.split("_")[0]
     parsed_files = None
 
-    if not re.match('^\w+$', zip_team_name):
+    if not re.match(r'^\w+$', zip_team_name):
         return False, None, None
 
 
