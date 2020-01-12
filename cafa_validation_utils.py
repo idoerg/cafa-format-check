@@ -55,7 +55,7 @@ def validate_author_line(author_line_str, expected_author=None):
             assert value == expected_author
         except AssertionError:
             is_valid = False
-            message = "Author: Excepted {expected}, but found {actual}".format(expected=expected_author, actual=value)
+            message = "Author: Expected {expected}, but found {actual}".format(expected=expected_author, actual=value)
 
     return is_valid, message
 
