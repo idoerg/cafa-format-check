@@ -86,6 +86,13 @@ def cafa_checker(input_file_handle, filename=None):
     model_count = 0
 
     for line_index, input_line in enumerate(input_file_handle):
+
+        try:
+            input_line = input_line.decode()
+        except AttributeError:
+            pass
+
+        input_line = input_line.strip()
         line_split = [i.strip() for i in input_line.split()]
         input_state = line_split[0]
 
@@ -115,6 +122,7 @@ def cafa_checker(input_file_handle, filename=None):
             accuracy_count = 0
             if model_count > 3:
                 return False, "Too many models. Only up to 3 allowed"
+
             is_correct, error_msg = model_check(input_line)
             is_correct, error_msg = handle_error(
                 is_correct, error_msg, input_line, line_index, filename
