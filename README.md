@@ -21,11 +21,13 @@ Based on the filename structure, the program will run cafa_binding_site_format_c
 cafa_do_format_checker, or cafa_hpo_format_checker.
 
 
-Authored by Iddo Friedberg and Tim Bergquist. Distributed under GPLv3 license (attached)
+Authored by Iddo Friedberg, Tim Bergquist and Scott Zarecor. Distributed under GPLv3 license (attached)
 
 Contact: idoerg@gmail.com
 
 Contact: trberg@uw.edu
+
+Contact: szarecor@iastate.edu
 
 *Important*: If you are participating in CAFA4, you should subscribe to the afp-cafa
 mailing list: https://mailman.iastate.edu/mailman/listinfo/afpcafa
