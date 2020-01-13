@@ -8,7 +8,7 @@ of CAFA submissions
 
 parsed_filename = namedtuple(
     "parsed_filename",
-    ("is_valid", "message", "filename", "team_name", "model_id", "taxonomy_id", "ontology")
+    ("is_valid", "message", "filename", "filepath", "team_name", "model_id", "taxonomy_id", "ontology")
 )
 
 parsed_zip_file = namedtuple(
@@ -103,6 +103,8 @@ def validate_filename(filename):
     is_valid = True
     message = 'ok'
     team_name = model_id = taxonomy_id = ontology = None
+
+    long_path = filename
     # If this is a path, we don't want to evaluate anything but the filename itself:
     filename = filename.split("/")[-1]
     split_filename = filename.rstrip(".txt").split("_")
@@ -157,7 +159,7 @@ def validate_filename(filename):
             is_valid = False
             message = 'With file {filename}, HPO is only valid with taxonomy 9606, not {taxonomy}'.format(filename=filename, taxonomy=taxonomy_id)
 
-    return parsed_filename(is_valid, message, filename, team_name, model_id, taxonomy_id, ontology)
+    return parsed_filename(is_valid, message, filename, long_path, team_name, model_id, taxonomy_id, ontology)
 
 def validate_one_team_per_archive(archive_handle):
     """ Check the files names contained in the passed archive to ensure that one and only one consistent team name
@@ -206,6 +208,8 @@ def validate_archive_name(filepath):
             for filename in zip_handle.namelist():
 
                 if 'DS_Store' in filename or '__MACOSX' in filename:
+                    continue
+                if filename.endswith("/"):
                     continue
 
                 parsed = validate_filename(filename)
