@@ -1,4 +1,6 @@
 
+++ CAFA4 Format Checker
+
 This repository contains Python scripts for checking the format of 
 prediction files for CAFA4
 
