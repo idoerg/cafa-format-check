@@ -14,15 +14,21 @@ def test_data_path():
     return "{}/test/test_data/end_to_end_data/".format(root_path)
 
 
-def test_team1234567890_zip(test_data_path, capfd):
+def test_team1234567890_zip_good(test_data_path, capfd):
     filepath = "{}valid/team1234567890.zip".format(test_data_path)
     is_valid = cafa_checker(filepath)
-
     output, error = capfd.readouterr()
     assert is_valid is True
     assert 'VALIDATION SUCCESSFUL' in output
     assert 'team1234567890.zip meets CAFA4 file naming specifications' in output
 
+def test_team1234567890_zip_bad(test_data_path, capfd):
+    filepath = "{}invalid/team1234567890.zip".format(test_data_path)
+    is_valid = cafa_checker(filepath)
+    output, error = capfd.readouterr()
+    assert is_valid is False
+    assert 'VALIDATION FAILED' in output
+    assert "Only one team is allowed per zip file" in output
 
 def test_basic_do_txt_file(test_data_path, capfd):
     filepath = "{}valid/ateam_1_9606_do.txt".format(test_data_path)
