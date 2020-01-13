@@ -8,7 +8,7 @@ of CAFA submissions
 
 parsed_filename = namedtuple(
     "parsed_filename",
-    ("is_valid", "message", "filename", "team_name", "model_id", "taxonomy_id", "ontology")
+    ("is_valid", "message", "filename", "filepath", "team_name", "model_id", "taxonomy_id", "ontology")
 )
 
 parsed_zip_file = namedtuple(
@@ -55,7 +55,7 @@ def validate_author_line(author_line_str, expected_author=None):
             assert value == expected_author
         except AssertionError:
             is_valid = False
-            message = "Author: Excepted {expected}, but found {actual}".format(expected=expected_author, actual=value)
+            message = "Author: Expected {expected}, but found {actual}".format(expected=expected_author, actual=value)
 
     return is_valid, message
 
@@ -103,6 +103,8 @@ def validate_filename(filename):
     is_valid = True
     message = 'ok'
     team_name = model_id = taxonomy_id = ontology = None
+
+    long_path = filename
     # If this is a path, we don't want to evaluate anything but the filename itself:
     filename = filename.split("/")[-1]
     split_filename = filename.rstrip(".txt").split("_")
@@ -136,7 +138,7 @@ def validate_filename(filename):
     # We can now move forward with validating each piece of metadata:
     if is_valid is True:
         # What to do about team name:
-        if not re.match('^\w+$', team_name):
+        if not re.match(r'^\w+$', team_name):
             is_valid = False
             message = "With file {filename}, {team_name} is not a valid team name".format(filename=filename, team_name=team_name)
 
@@ -157,7 +159,7 @@ def validate_filename(filename):
             is_valid = False
             message = 'With file {filename}, HPO is only valid with taxonomy 9606, not {taxonomy}'.format(filename=filename, taxonomy=taxonomy_id)
 
-    return parsed_filename(is_valid, message, filename, team_name, model_id, taxonomy_id, ontology)
+    return parsed_filename(is_valid, message, filename, long_path, team_name, model_id, taxonomy_id, ontology)
 
 def validate_one_team_per_archive(archive_handle):
     """ Check the files names contained in the passed archive to ensure that one and only one consistent team name
@@ -190,7 +192,7 @@ def validate_archive_name(filepath):
     zip_team_name = filepath.rstrip(".zip").split("/")[-1].strip() #.split("_")[0]
     parsed_files = None
 
-    if not re.match('^\w+$', zip_team_name):
+    if not re.match(r'^\w+$', zip_team_name):
         return False, None, None
 
 
@@ -206,6 +208,8 @@ def validate_archive_name(filepath):
             for filename in zip_handle.namelist():
 
                 if 'DS_Store' in filename or '__MACOSX' in filename:
+                    continue
+                if filename.endswith("/"):
                     continue
 
                 parsed = validate_filename(filename)

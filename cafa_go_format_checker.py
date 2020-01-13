@@ -122,6 +122,7 @@ def go_prediction_check(inrec):
     correct = True
     errmsg = None
     fields = [i.strip() for i in inrec.split()]
+
     if len(fields) != 3:
         correct = False
         errmsg = "GO prediction: wrong number of fields. Should be 3"
@@ -178,9 +179,15 @@ def cafa_checker(infile, fileName):
     n_models = 0
     line_num = 0
     for inline in infile:
+        try:
+            inline = inline.decode()
+        except AttributeError:
+            pass
+
         line_num += 1
-        inrec = [i.strip() for i in inline.split()]
+        inrec = [i.strip() for i in inline.strip().split()]
         field1 = inrec[0]
+
         # Check which field type (state) we are in
         if field1 == "AUTHOR":
             state = "author"
@@ -194,9 +201,7 @@ def cafa_checker(infile, fileName):
             state = "end"
         else: #default to prediction state
             state = "go_prediction"
-#        print "****"
-#        print "FIELD1", field1
-#        print inline, state
+
         # Check for errors according to state
         if state == "author":
             correct,errmsg = author_check(inline)
@@ -209,7 +214,8 @@ def cafa_checker(infile, fileName):
             n_accuracy = 0
             if n_models > 3:
                 return False, "Too many models. Only up to 3 allowed"
-            correct,errmsg = model_check(inline)
+
+            correct, errmsg = model_check(inline)
             correct, errmsg = handle_error(correct, errmsg, inline, line_num, fileName)
             if not correct:
                 return correct, errmsg
@@ -237,6 +243,7 @@ def cafa_checker(infile, fileName):
                 if not correct:
                     return correct, errmsg
         elif state == "go_prediction":
+
             correct, errmsg = go_prediction_check(inline)
             correct, errmsg = handle_error(correct, errmsg, inline, line_num, fileName)
             if not correct:

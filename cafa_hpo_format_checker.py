@@ -165,6 +165,11 @@ def cafa_checker(infile, fileName):
     n_models = 0
     line_num = 0
     for inline in infile:
+        try:
+            inline = inline.decode()
+        except AttributeError:
+            pass
+
         line_num += 1
         inrec = [i.strip() for i in inline.split()]
         field1 = inrec[0]
