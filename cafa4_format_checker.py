@@ -28,6 +28,8 @@ CAFA_VERSION = 4
 
 def ontology_validator(ontology, read_handle, filepath):
     """ A helper wrapper around the individual ontology checkers for go, do, hpo """
+
+    # Map ontology strings to validation functions:
     VALIDATORS = {
         'do': do_checker,
         'go': go,

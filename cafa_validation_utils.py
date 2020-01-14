@@ -189,12 +189,42 @@ def validate_archive_name(filepath):
     """
     is_valid = True
     message = 'ok'
-    zip_team_name = filepath.rstrip(".zip").split("/")[-1].strip() #.split("_")[0]
+    split_filename = filepath.rstrip(".zip").split("/")[-1].strip().split("_")
+    zip_team_name = split_filename[0]
+    print("********************")
+    print("TESTING {}".format(filepath))
+
+    if len(split_filename) > 2:
+        return parsed_zip_file(
+            is_valid=False,
+            message='Zip file names cannot include more than one underscore character',
+            team_name=zip_team_name,
+            files=[]
+        )
+
+    if len(split_filename) == 2:
+        try:
+            ordinal = int(split_filename[-1])
+        except ValueError:
+            # the portion of the filename following the underscore which should represent an int, is invalid
+            return parsed_zip_file(
+                is_valid=False,
+                message='The portion of the zip file name following the underscore should be an integer',
+                team_name=zip_team_name,
+                files=[]
+            )
+
+
+
     parsed_files = None
 
     if not re.match(r'^\w+$', zip_team_name):
-        return False, None, None
-
+        return parsed_zip_file(
+            is_valid=False,
+            message='Team names in files can only include alphanumeric characters',
+            team_name=zip_team_name,
+            files=[]
+        )
 
     with ZipFile(filepath, "r") as zip_handle:
         is_valid, team_count, team_names = validate_one_team_per_archive(zip_handle)
@@ -202,6 +232,10 @@ def validate_archive_name(filepath):
         if not is_valid:
             message = "Only one team is allowed per zip file"
         else:
+
+            if team_names[0] != zip_team_name:
+                is_valid = False
+                message = 'Only one team is allowed per zipfile. "{}" and "{}" do not match.'.format(zip_team_name, team_names[0])
 
             parsed_files = []
 

@@ -43,7 +43,7 @@ def test_basic_go_txt_file(test_data_path):
 
 
 def test_mixed_predictions_zip_file(test_data_path, capfd):
-    filepath = "{}invalid/mixed_predictions.zip".format(test_data_path)
+    filepath = "{}invalid/Test1_9.zip".format(test_data_path)
     is_valid = cafa_checker(filepath)
     # Capture print statements to stdout
     output, error = capfd.readouterr()
@@ -87,11 +87,13 @@ def test_invalid_term_centric_zip(test_data_path, capfd):
     output, error = capfd.readouterr()
     assert is_valid is False
     assert 'VALIDATION FAILED' in output
-    assert 'Only one team is allowed per zip file' in output
+    #assert 'Only one team is allowed per zip file' in output
+    assert 'Zip file names cannot include more than one underscore character' in output
 
 
 def test_invalid_protein_centric_zip(test_data_path, capfd):
-    filepath = "{}invalid/protein_centric_test_predictions.zip".format(test_data_path)
+    #filepath = "{}invalid/protein_centric_test_predictions.zip".format(test_data_path)
+    filepath = "{}invalid/TestTeam1_3.zip".format(test_data_path)
     is_valid = cafa_checker(filepath)
     # Capture print statements to stdout
     output, error = capfd.readouterr()
@@ -101,7 +103,7 @@ def test_invalid_protein_centric_zip(test_data_path, capfd):
 
 
 def test_invalid_binding_site_zip(test_data_path, capfd):
-    filepath = "{}invalid/binding_site_test_predictions.zip".format(test_data_path)
+    filepath = "{}invalid/TestTeam1_1.zip".format(test_data_path)
     is_valid = cafa_checker(filepath)
     # Capture print statements to stdout
     output, error = capfd.readouterr()
@@ -127,8 +129,8 @@ def test_invalid_mixed_ontology_data_in_zip_file(test_data_path, capfd):
     output, error = capfd.readouterr()
     assert is_valid is False
     assert 'VALIDATION FAILED' in output
-    assert 'Error in bteam_1_9606_do.txt, line 0, Author: Expected bteam, but found ateam' in output
-
+    #assert 'Error in bteam_1_9606_do.txt, line 0, Author: Expected bteam, but found ateam' in output
+    assert 'Only one team is allowed' in output
 
 def test_valid_tc_hpo_txt_file_with_implied_taxonomy(test_data_path):
     filepath = "{}valid/TC_ateam_3_hpo.txt".format(test_data_path)
