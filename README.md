@@ -5,7 +5,7 @@ This repository contains Python scripts for checking the format of
 prediction files for CAFA4
 
 For more information on CAFA  see: http://biofunctionprediction.org
-Specifically, for the CAFA rules see: https://www.biofunctionprediction.org/cafa-targets/CAFA4_rules%20_10_2019_v3.pdf
+Specifically, for the CAFA rules see: https://www.biofunctionprediction.org/cafa-targets/CAFA4_rules%20_01_2020_v4.pdf
 
 Running
 
