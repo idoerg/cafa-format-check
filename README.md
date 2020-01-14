@@ -5,7 +5,7 @@ This repository contains Python scripts for checking the format of
 prediction files for CAFA4
 
 For more information on CAFA  see: http://biofunctionprediction.org
-Specifically, for the CAFA rules see: https://www.biofunctionprediction.org/cafa-targets/CAFA4_rules%20_10_2019_v3.pdf
+Specifically, for the CAFA rules see: https://www.biofunctionprediction.org/cafa-targets/CAFA4_rules%20_01_2020_v4.pdf
 
 Running
 
@@ -19,7 +19,7 @@ Where "filename" is the path to the prediction file or zipped archive
 
 This checks any type of prediction file.
 CAFA4 format checker  will first check that the filename is correctly formatted.
-Based on the filename structure, the program will run cafa_binding_site_format_checker, cafa_go_format_checker, 
+Based on the filename structure, the program will run cafa_go_format_checker, 
 cafa_do_format_checker, or cafa_hpo_format_checker.
 
 

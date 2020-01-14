@@ -66,7 +66,7 @@ def test_one_team_per_archive_invalid_input(test_data_path):
     ''' Test that an archive containing files with multiple team names in the filenames
     fails the one team per archive validation
      '''
-    zip_path = "{}invalid/mixed_predictions.zip".format(test_data_path)
+    zip_path = "{}invalid/Test1_9.zip".format(test_data_path)
 
     with ZipFile(zip_path, "r") as zip_handle:
         is_valid, team_name_count, team_names = validate_one_team_per_archive(zip_handle)
