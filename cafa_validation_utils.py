@@ -107,7 +107,8 @@ def validate_filename(filename):
     long_path = filename
     # If this is a path, we don't want to evaluate anything but the filename itself:
     filename = filename.split("/")[-1]
-    split_filename = filename.rstrip(".txt").split("_")
+    split_filename = filename[:-4].split("_")
+    #split_filename = filename.rstrip(".txt").split("_")
     meta_count = len(split_filename)
 
     if not filename.endswith(".txt"):
@@ -189,7 +190,17 @@ def validate_archive_name(filepath):
     """
     is_valid = True
     message = 'ok'
-    split_filename = filepath.rstrip(".zip").split("/")[-1].strip().split("_")
+
+    if filepath[-4:] != ".zip":
+        return parsed_zip_file(
+            is_valid=False,
+            message='Archive files must be zip archives',
+            team_name=None,
+            files=[]
+        )
+
+    split_filename = filepath[:-4].split("/")[-1].strip().split("_")
+    #split_filename = filepath.rstrip(".zip").split("/")[-1].strip().split("_")
     zip_team_name = split_filename[0]
     print("********************")
     print("TESTING {}".format(filepath))
