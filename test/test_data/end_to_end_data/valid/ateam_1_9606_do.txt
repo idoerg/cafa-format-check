@@ -1,6 +1,6 @@
 AUTHOR ateam
 MODEL 1
-KEYWORDS sequence alignment.
+KEYWORDS sequence alignment, convolutional neural network.
 T96060020120	DO:0008270	0.80
 T96060020120	DO:0003700	0.80
 T96060020120	DO:0006351	0.80
