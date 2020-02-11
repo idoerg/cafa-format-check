@@ -14,6 +14,7 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import re
 import sys
+from cafa_validation_utils import  get_valid_keywords
 
 pr_field = re.compile("^PR=[0,1]\.[0-9][0-9];$")
 rc_field = re.compile("^RC=[0,1]\.[0-9][0-9]$")
@@ -23,20 +24,7 @@ confidence_field = re.compile("^[0,1]\.[0-9][0-9]$")
 legal_states1 = ["author","model","keywords","accuracy","hpo_prediction","end"]
 legal_states2 = ["author","model","keywords","hpo_prediction","end"]
 legal_states3 = ["author","model","hpo_prediction","end"]
-
-legal_keywords = [
-"sequence alignment", "sequence-profile alignment", "profile-profile alignment", "phylogeny",
-"sequence properties",
-"physicochemical properties", "predicted properties", "protein interactions", "gene expression",
-"mass spectrometry",
-"genetic interactions", "protein structure", "literature", "genomic context", "synteny", 
-"structure alignment",
-"comparative model", "predicted protein structure", "de novo prediction", "machine learning", 
-"genome environment", 
-"operon", "ortholog", "paralog", "homolog", "hidden Markov model", "clinical data", "genetic data", 
-"natural language processing", "other functional information"
-]
-    
+legal_keywords = get_valid_keywords()
 
 def author_check(inrec):
     correct = True

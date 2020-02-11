@@ -60,6 +60,22 @@ def validate_author_line(author_line_str, expected_author=None):
     return is_valid, message
 
 
+def get_valid_keywords():
+    # CAFA 4 (2020) valid keywords:
+    valid_keywords = ['autoencoders', 'bag-of-words', 'clinical data', 'comparative model', 'convolutional neural network',
+     'decision tree', 'deep learning', 'de novo prediction', 'gene expression', 'genetic data', 'genetic interactions',
+     'genome environment', 'genomic context', 'gradient boosted tree', 'hidden Markov model', 'homolog', 'k-mers',
+     'latent dirichlet allocation', 'linear regression', 'literature', 'logistic regression', 'machine learning',
+     'mass spectrometry', 'natural language processing', 'neural network', 'operon', 'ortholog',
+     'other functional information', 'paralog', 'phylogeny', 'physicochemical properties', 'predicted properties',
+     'predicted protein structure', 'profile-profile alignment', 'protein interactions', 'protein structure',
+     'random forest', 'recurrent neural network', 'sequence alignment', 'sequence-profile alignment',
+     'sequence properties', 'structure alignment', 'supervised learning', 'support vector machine', 'synteny', 'tf-idf',
+     'unsupervised learning', 'word embeddings']
+
+    return valid_keywords
+
+
 def validate_taxonomy(taxonomy_id_str):
 
     VALID_TAXONOMIES = (
